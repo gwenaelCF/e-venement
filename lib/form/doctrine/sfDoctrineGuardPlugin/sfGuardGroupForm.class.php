@@ -19,4 +19,48 @@ class sfGuardGroupForm extends PluginsfGuardGroupForm
       ->setOption('order_by',array('name',''))
       ->setOption('expanded',true);
   }
+  
+  public function saveUsersList($con = null)
+  {
+    if (!$this->isValid())
+    {
+      throw $this->getErrorSchema();
+    }
+
+    if (!isset($this->widgetSchema['users_list']))
+    {
+      // somebody has unset this widget
+      return;
+    }
+
+    if (null === $con)
+    {
+      $con = $this->getConnection();
+    }
+
+    //Get back users from all domains
+    $existing = Doctrine::getTable('sfGuardUser')->createQuery('u')
+      ->leftJoin('u.Groups g')
+      ->andWhere('g.id = ?', $this->object->id)
+      ->execute()
+      ->getPrimaryKeys();
+
+    $values = $this->getValue('users_list');
+    if (!is_array($values))
+    {
+      $values = array();
+    }
+
+    $unlink = array_diff($existing, $values);
+    if (count($unlink))
+    {
+      $this->object->unlink('Users', array_values($unlink));
+    }
+
+    $link = array_diff($values, $existing);
+    if (count($link))
+    {
+      $this->object->link('Users', array_values($link));
+    }
+  }
 }
