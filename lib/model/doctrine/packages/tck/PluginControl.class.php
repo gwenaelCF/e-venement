@@ -27,7 +27,7 @@ abstract class PluginControl extends BaseControl
   public function preSave($event)
   {
     $field = ControlForm::getFieldsConfig();
-    if ( !in_array('id', $field) && !$this->force_ticket_id )
+    if ( !in_array('id', $field) && !in_array('barcode', $field) && !$this->force_ticket_id )
     {
       if ( !in_array('othercode', $field) && intval($this->ticket_id).'' === ''.$this->ticket_id )
         $field = array('id');
