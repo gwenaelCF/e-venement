@@ -46,6 +46,7 @@ class ProductForm extends BaseProductForm
     ;
     
     $this->widgetSchema['vat_id']->setOption('order_by', array('value', ''));
+    $this->validatorSchema['vat_id']->setOption('required', true);
     
     // LINKS
     $this->widgetSchema   ['linked_manifestations_list'] = new cxWidgetFormDoctrineJQuerySelectMany(array(

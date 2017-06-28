@@ -19,7 +19,6 @@ generator:
         prices: { help: then set up their values }
         accounting_account: { label: Account, help: A facilitator for accounting }
         meta_event_id: { help: "Associating a product to a meta-event insures that it will not be sold again after this meta-event or if your users do not have access to this meta-event." }
-        vat_id: { help: "If it remains unset, it means 0%." }
         shipping_fees_vat_id: { label: VAT on shipping fees, help: "If it remains unset, it means 0%." }
         shipping_fees: { help: PIT, but can be overwritten by the fees of the product category if declared }
         description: { help: "Especially useful for online sales." }
