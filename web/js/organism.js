@@ -1,7 +1,8 @@
 $(document).ready(function(){
   setTimeout(batch_change,1000); // setTimeout is a hack...
   
-  $('#organism_siret').mask($('#organism_siret_mask').val());
+  if ( $('#organism_siret_mask').val() )
+    $('#organism_siret').mask($('#organism_siret_mask').val());
 });
 
 function batch_change()
