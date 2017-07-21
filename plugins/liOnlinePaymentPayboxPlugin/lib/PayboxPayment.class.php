@@ -86,6 +86,7 @@
       $this->site     = sfConfig::get('app_payment_site');
       $this->return   = sfConfig::get('app_payment_return','amount:M;transaction_id:R;card_type:C;ip_country:I;paybox_id:S;authorisation:A;error:E;signature:K');
       $this->hash     = sfConfig::get('app_payment_hash','SHA512');
+      $this->entity   = sfConfig::get('app_payment_entity', 0);
       $this->key      = sfConfig::get('app_payment_key');
       $this->url      = sfConfig::get('app_payment_url',array());
       $this->autosubmit = sfConfig::get('app_payment_autosubmit',true);
@@ -162,6 +163,7 @@
       $arr['PBX_CMD'] = $this->transaction->id;
       $arr['PBX_PORTEUR'] = $this->transaction->Contact->email;
       $arr['PBX_RETOUR'] = $this->return;
+      $arr['PBX_ENTITE'] = $this->entity;
       $arr['PBX_HASH'] = $this->hash;
       $arr['PBX_TIME'] = $this->datetime;
       $arr['PBX_EFFECTUE'] = url_for($this->url['normal'],true);
