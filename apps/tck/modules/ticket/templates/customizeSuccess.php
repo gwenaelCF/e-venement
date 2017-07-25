@@ -607,6 +607,7 @@
     document.getElementById("serializer").onclick = function () {
         //myTck = JSON.stringify(canvas);
         //console.log(myTck);
+        canvas.setBackgroundColor('');
         var myTck = canvas.toSVG({width:"100%", height:"100%"});
         console.log(canvas.toObject());
         console.log(canvas.toSVG({width:"100%", height:"100%"}));
@@ -619,6 +620,7 @@
                     ticketwidth: $('input[name=ticketWidth]').val()
                 }
         );
+        canvas.setBackgroundColor('white');
     };
     
     //back button
@@ -658,8 +660,7 @@ $( window ).on( "load", function() {
     var dragFromTemplateOptions = Object.assign({}, dragFromTabsOptions);
     dragFromTemplateOptions.scope = "fromCanvas";
     
-    $('#sf_fieldset_manifestation .draggable, #sf_fieldset_ticket .draggable, #sf_fieldset_transaction .draggable, #sf_fieldset_gauge .draggable').draggable(dragFromTabsOptions);
-//    $('.draggable').bind('drop', function(event, ui) { $(this).after($(ui.helper).clone().draggable());});
+    $('#sf_admin_form_tab_menu .draggable').draggable(dragFromTabsOptions);
 
     $('#tktCanvas').droppable({
                                 tolerance: "pointer",
@@ -667,7 +668,6 @@ $( window ).on( "load", function() {
                                 drop: function(event, ui) {
                                     dropPt = {x: event.pageX-event.target.parentNode.offsetLeft - 30, y: event.pageY-event.target.parentNode.offsetTop - 10 };
                                     var dropping = ui.draggable.clone(false);
-                                    //dropping.attr('name', dropping.attr('id'));
                                     var dropZone = 'main';
                                     if(rectControl && dropPt.x >= rectControl.TL.x && dropPt.x <= rectControl.BR.x){
                                         dropZone = 'control';

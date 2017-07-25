@@ -13,40 +13,52 @@
  */
 class ticketComponents extends sfComponents {
     public function executeCustomTckMenu(){
-        $myMenu = array();
+        $menu = array();
         //TODO more generic arrays
         $mandatory = array();
-        $manif = array();
+        $ticket = array();
+        $manifestation = array();
         $gauge = array();
         $transaction = array();
         $others = array();
         $try = $this->json;
+        //retrieve params and create array for menu according to status
         foreach ($try as $key => $value) {
            if (!$value['optional']){
                $mandatory[]=$key;
            }else if($value['displayed']){
-               switch(explode('.',$key)[0]){
-                   case 'Manifestation':
-                       $manif[] = $key;
-                       break;
-                   case 'Transaction':
-                       $transaction[] = $key;
-                       break;
-                   case 'Gauge':
-                       $gauge[] = $key;
-                       break;
-                   default:
-                       $others[] = $key;
-                       break;
+               $subKeys = explode('.',$key);
+               if (count($subKeys)==1){
+                   //ticket has no enter key
+                   $ticket[] = $key;
+               }else{
+                    switch(explode('.',$key)[0]){
+                        case 'Manifestation':
+                            $manifestation[] = $key;
+                            break;
+                        case 'Transaction':
+                            $transaction[] = $key;
+                            break;
+                        case 'Gauge':
+                            $gauge[] = $key;
+                            break;
+                        default:
+                            $others[] = $key;
+                            break;
+                    }
                }
-               
            }
         }
-        $this->manif=$manif;
-        $this->mandatory=$mandatory;
-        $this->gauge=$gauge;
-        $this->transaction=$transaction;
-        $this->others=$others;
+        
+        
+        $menu['mandatory']=$mandatory;
+        $menu['ticket']=$ticket;
+        $menu['manifestation']=$manifestation;
+        $menu['gauge']=$gauge;
+        $menu['transaction']=$transaction;
+        $menu['others']=$others;
+        
+        $this->menu=$menu;
         
     }
 }
