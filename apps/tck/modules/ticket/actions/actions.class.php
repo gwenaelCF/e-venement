@@ -372,4 +372,89 @@ class ticketActions extends sfActions
     // tarif_names []
     require('transaction-form.php');
   }
+  
+  
+  // goto customize
+  public function executeCustomize(sfWebRequest $request)
+  {
+          //$this->form = new CustomTicketForm();
+          $fileJson = fopen(__DIR__.'/../config/ticketParam.json', 'r');
+          $jsonParam = json_decode(fread($fileJson,filesize(__DIR__.'/../config/ticketParam.json')), TRUE);
+          fclose($fileJson);
+          //treated in the component
+          //uasort($jsonParam, 'comPar2');
+          
+          $size = array();
+            for ($i = 6; $i < 20; $i++) {
+                $size[$i] = $i;
+            }
+          // TODO USE THAT FOR GENERALISATION!!  
+          //$this->tckForm =new CustomTicketForm(array(),array('param'=>$jsonParam));
+          
+          //should come from the menu
+          $this->eventId = 43;
+          $this->event = null;
+          $this->json = $jsonParam;
+          $this->font = array("Arial"=>"Arial", "Lucida"=>"Lucida", "Helvetica"=>"Helvetica", "Lucida-Console"=>"Lucida Console");
+          $this->size = $size;
+  }
+  
+  //goto customPrint
+  public function executeCustomPrint(sfWebRequest $request)
+  {
+      require('customPrint.php');
+      
+  }
+  
+  //save the template
+  public function executeSubmit(sfWebRequest $request){
+      //$this->forwardUnless($query = $request->getParameter('query'), 'job', 'index');
+
+      //$this->jobs = Doctrine_Core::getTable('JobeetJob')->getForLuceneQuery($query);
+
+      if ($request->isXmlHttpRequest()) {
+//            if ('*' == $query || !$this->jobs) {
+//                return $this->renderText('No results.');
+//            }
+//
+//            return $this->renderPartial('job/list', array('jobs' => $this->jobs));
+          $event = $request->getParameter('event_id');
+          //$all = $request->extractParameters
+          $data = $request->getParameter('datacustom');
+          $tckheight = $request->getParameter('tckheight');
+          $tckwidth = $request->getParameter('tckwidth');
+          $template = Doctrine_Core::getTable('tckCustom')
+                  ->findOneByEventId($event);
+          if($template==null){
+              $template=new TckCustom();
+          }else{
+              $template->version +=1;
+          }
+          $template->name = 'testing';
+          $template->event_id = $event;
+          $template->dataCustom = $data;
+          $template->description = 'mouhahahahha';
+          $template->tckHeight = $tckheight;
+          $template->tckWidth = $tckwidth;
+          
+          $template->save();
+          
+          return $this->renderText('ticket template saved for '.$event);
+        }
+    }
+
+  
+  public function executeCustomizeMenu(sfWebRequest $request){
+      
+    $q = Doctrine::getTable('Event')
+    ->createQuery('e')
+    ->orderBy('translation.name')
+    ->limit(500)
+    ->andWhereIn('e.meta_event_id',array_keys($this->getUser()->getMetaEventsCredentials()));
+    
+    $this->events = array();
+    foreach ( $q->execute() as $event )
+      $this->events[] = [$event->id => $event.' ('.$event->MetaEvent.')'];
+      
+  }
 }
