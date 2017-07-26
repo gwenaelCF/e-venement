@@ -4,11 +4,17 @@ generator:
     model_class:           CustomTemplate
     theme:                 jroller
     non_verbose_templates: true
-    with_show:             false
+    with_show:             true
     singular:              ~
     plural:                ~
     route_prefix:          customTemplate
     with_doctrine_route:   true
     actions_base_class:    sfActions
-
+    
+    config:
+        actions:  ~
+        fields:  ~
+        list:  ~
+        form: ~
+        new: ~
 

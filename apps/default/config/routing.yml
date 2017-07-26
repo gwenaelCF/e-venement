@@ -46,9 +46,9 @@ picture:
 customTemplate:
   class: sfDoctrineRouteCollection
   options:
-    model:                TckCustom
-    module:               tckCustom
-    prefix_path:          /tckCustom
+    model:                CustomTemplate
+    module:               customTemplate
+    prefix_path:          /customTemplate
     column:               id
     with_wildcard_routes: true
 

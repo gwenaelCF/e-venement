@@ -4,10 +4,10 @@ require_once dirname(__FILE__).'/../lib/customTemplateGeneratorConfiguration.cla
 require_once dirname(__FILE__).'/../lib/customTemplateGeneratorHelper.class.php';
 
 /**
- * tckCustom actions.
+ * customTemplate actions.
  *
  * @package    symfony
- * @subpackage tckCustom
+ * @subpackage customTemplate
  * @author     Your name here
  * @version    SVN: $Id: actions.class.php 23810 2009-11-12 11:07:44Z Kris.Wallsmith $
  */

@@ -1,4 +1,4 @@
-<?php // use_stylesheet('/css/default.css');  ?>
+<?php use_stylesheet('/css/content.css');  ?>
 <?php use_stylesheet('/css/event.css'); ?>
 <?php // use_stylesheet('/css/manifestation.css');  ?>
 <?php use_stylesheet('/css/view.css'); ?>
@@ -8,31 +8,50 @@
 <?php use_helper('CrossAppLink') ?>
 
 <?php //var_dump($events->getRawValue())?>
-<form action="customize" method="POST">
-<div class='sf_admin_batch_actions_choice'>
-    <h3>
-        Select a type of template
-    </h3>
-    <select required id="tempType" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status">
-        <option value="">please choose</option>
-        <option value="therm">thermal printed ticket</option>
-        <option value="dmz">dematerialized ('A' series)</option>
-    </select><br>
-</div>
-<br style="clear: both;"> 
-<div id="selectionText" class="sf_admin_batch_actions_choice">
-    
-    <h3>
-         
-    </h3>
-    <select id="selecItem" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status" disabled>
-        <option value=""></option>
-    </select>
-    <input id='selButton' value="ok" class="butCustom ui-button ui-state-default ui-corner-all" type="submit">
-</div>
-</form>
+<div id="sf_admin_container">
+    <div id="sf_admin_content" class="ui-corner-all ui-widget-content">
+    <div class="ui-widget ui-corner-all ui-widget-content">
+        <div class="ui-widget-header ui-corner-all fg-toolbar">
+            <h1 title="">Create a new template</h1>
+        </div>
+        <form action="customize" method="POST">
+        <div class='sf_admin_batch_actions_choice'>
+            <br>
+            <h3>
+                Select a type of template
+            </h3>
+            <select required id="tempType" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status">
+                <option value="">please choose</option>
+                <option value="therm">thermal printed ticket</option>
+                <option value="dmz">dematerialized ('A' series)</option>
+            </select><br>
+        </div>
+        <br style="clear: both;"> 
+        <div id="selectionText" class="sf_admin_batch_actions_choice">
 
+            <h3>
 
+            </h3>
+            <select id="selecItem" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status" disabled>
+                <option value=""></option>
+            </select>
+            <input id='selButton' value="ok" class="butCustom ui-button ui-state-default ui-corner-all" type="submit">
+        </div>
+        </form>
+    </div>
+    </div>
+    <div id="more">
+        <table>
+    <div class="ui-widget ui-corner-all ui-widget-content">
+        <div class="ui-widget-header ui-corner-all fg-toolbar">
+            <h1 title="">List of existing templates</h1>
+        </div>
+        
+    </div>
+            </table>
+
+    </div>
+</div>
 
 
 <script>
@@ -49,7 +68,6 @@
             //  If not remove the switch/case.
             // TODO check param needed and apply the correct algo
             case "therm":
-                //data2link = ;
                 
             case "dmz":
                 data2link = <?php echo json_encode($events->getRawValue()) ?>;

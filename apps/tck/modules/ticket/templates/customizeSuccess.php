@@ -43,7 +43,7 @@
                 <div id="sf_admin_form_tab_menu" class="ui-tabs ui-widget ui-widget-content ui-tabs-vertical ui-helper-clearfix">
                    
                     <?php include_component('ticket', 'customTckMenu', array('json' => $json)) ?>
-
+                    
                 </div>
                 
             </form>
@@ -58,7 +58,7 @@
             <span id='flashCanvas' style="color: red; opacity: 0;">Warning text can be inserted here</span>
             <div id="text-controls" class="toolbar ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix" role="toolbar">
                 <button type="button" class="btn-object-remove ui-controlgroup-item" id="object-remove">Remove</button>
-                <label for="font-family" style="display:inline-block">Font type:</label>
+                <label for="font-family">Font type:</label>
                 <select id="font-family" class="slct-object-action ui-controlgroup-item" data-property="fontFamily">
                     <option value="arial">Arial</option>
                     <option value="arial narrow">Arial Narrow</option>
@@ -92,8 +92,8 @@
                 <button type="button" class="btn-object-action ui-controlgroup-item" id="text-cmd-linethrough" data-property="textDecoration" data-value="line-through" hidden>Linethrough</button>
                 <button type="button" class="btn-object-action ui-controlgroup-item" id="text-cmd-overline" data-property="textDecoration" data-value="overline" hidden>Overline</button>
             </div>
+            
         </div>
-        
         </div>
     </div>
     <div id="templating">
@@ -127,6 +127,7 @@
             <input type="number" name="ticketWidth" id="ticketWidth" value="150" hidden>
         </form>
     </div>
+
 <script type="text/javascript">
     
     
@@ -246,7 +247,7 @@
         var checkedClass = "checked";
         target.toggleClass(checkedClass);
         if (target.hasClass(checkedClass)) {
-            addText2Canvas(target);
+            addItem2Canvas(target);
         } else {
             removeTextFromCanvas(target);
         }
@@ -259,68 +260,115 @@
         canvas.remove(myObj[index]);
 
     }
-
-    function addText2Canvas(target, holder='main', position={x:1,y:1})
-    {
+    
+    //TODO generalize for any TYPE
+    function buildTextObject(target, contain){
         var targetLabel = target.attr("value");
         var targetName = target.attr("name");
         var targetId = target.attr("id");
-        var lefty = fabric.util.getRandomInt(0, canvas.width);
-        var topty = fabric.util.getRandomInt(0, canvas.height);
         var targetFontType = "Arial";
         var targetFontSize = 16;
-        var contain = (holder=='main')?rectMain:rectControl;
         var text2add = new TckLabel(targetLabel, {
                                     fontFamily: targetFontType, 
-                                    fontSize: targetFontSize, 
-                                    left: lefty, 
-                                    top: topty, 
+                                    fontSize: targetFontSize,
                                     name: targetName,
                                     container : contain,
                                     id : targetId
                                 });
-        text2add.left = position.x;
-        text2add.top = position.y;
-        canvas.add(text2add);
+        return text2add;
+    }
+    
+    function buildImageObject(target, contain){
+        var source = target[0].firstChild;
+        var imgHeight = source.height;
+        var imgWidth = source.width;
+        
+        var item2add = new fabric.Image(source);
+        item2add.set({
+                        width:              imgWidth, 
+                        height:             imgHeight, 
+                        id:                 target.attr('id'), 
+                        container:          contain,
+                        lockScalingFlip:    true,
+                        hasRotatingPoint:   false,
+                        lockSkewingX:       true,
+                        lockSkewingY:       true
+                    });
+        item2add.setControlsVisibility({
+            mb: false,
+            ml: false,
+            mr: false,
+            mt: false
+        });
+        item2add.on('scaling', scalingHandler);
+        return item2add;
+    }
+    
+    // keeping tracks of all items
+    var itemsOnCanvas = [];
+    
+    function addItem2Canvas(target, holder='main', position={x:1,y:1}, type='text')
+    {
+        var contain = (holder=='main')?rectMain:rectControl;
+        target.id = holder+'.'+target.id;
+        var item2add;
+        switch(type) {
+            case 'text':
+                console.log('case text');
+                item2add = buildTextObject(target, contain);
+                break;
+            case 'image':
+                console.log('case image');
+                item2add = buildImageObject(target, contain);
+                break;
+            default:
+                console.log('error create object');
+                return;
+        }
+        item2add.left = position.x;
+        item2add.top = position.y;
+        canvas.add(item2add);
         console.log('adding');
-        console.log(text2add);
+        console.log(item2add);
         var counter =0;
         //could be a pb for generalisation, TODO algo review
         var minLeft = (holder==='main')? containStart:controlStart;
-        var maxLeft = (holder==='main')? containWidth+containStart-text2add.width 
-                                    : controlStart+pxCtrlWidth - text2add.width; 
-        while(isOutOfHolder(text2add) || isIntersecting(text2add)){
-            text2add.setLeft(fabric.util.getRandomInt(minLeft, maxLeft));
-            text2add.setTop(fabric.util.getRandomInt(0, canvas.height));
-            text2add.setCoords();
+        var maxLeft = (holder==='main')? containWidth+containStart-item2add.width 
+                                    : controlStart+pxCtrlWidth - item2add.width; 
+        while(isOutOfHolder(item2add) || isIntersecting(item2add)){
+            item2add.setLeft(fabric.util.getRandomInt(minLeft, maxLeft));
+            item2add.setTop(fabric.util.getRandomInt(0, canvas.height));
+            item2add.setCoords();
             counter +=1;
             if (counter>1500){
                 //TODO handle case !2B tested!
-                canvas.remove(text2add);
+                canvas.remove(item2add);
                 fadeInOut("Please make room before adding !", 8000);
-                return;
+                return false;
             }
         }
         fabric.util.animateColor('#FFF700', '#eee', 500, {
             onChange: function(val) {
-            text2add.set('backgroundColor', val);
+            item2add.set('backgroundColor', val);
             canvas.renderAll();
           },
           onComplete: function(){
-              text2add.set('backgroundColor', '');
-              canvas.setActiveObject(text2add);
+              item2add.set('backgroundColor', '');
+              canvas.setActiveObject(item2add);
             }
         });
-        console.log(text2add);
         canvas.renderAll();
+        itemsOnCanvas.push(item2add);
+        console.log(itemsOnCanvas);
+        return true;
     }
 
     //called on document load
     function checkStatePutEvent() {
         $('.addLabelButton.checked').each(function () {
-            addText2Canvas($(this));
+            addItem2Canvas($(this));
             if (rectControl){
-                addText2Canvas($(this), 'control');
+                addItem2Canvas($(this), 'control');
             }
         });
         deselectHandler();
@@ -379,14 +427,16 @@
         $(input).val(getActiveProp($(input).attr("data-property")));
     }
     
+
     
     //canvas objects
         //events
     canvas.on('object:selected', selectHandler);
     canvas.on('object:moving', movingHandler);
     canvas.on('selection:cleared', deselectHandler);
-    canvas.on('mouse:down', mDownHandler);
+    //canvas.on('mouse:over', mOverHandler);
     canvas.on('mouse:up', mUpHandler);
+    //canvas.on('object:modified', modifiedHandler);
     
     var upperCanvas = canvas.getSelectionElement();
     $(upperCanvas).on('mouseout', outHandler);
@@ -412,47 +462,67 @@
     }
     
     function isIntersecting(target){
-        var allObj = canvas.getObjects();
         var isIt = false;
-        for (ind in allObj){
-            if (allObj[ind]===target || allObj[ind].get('type')!=="text"){
-                continue;
-            }else{
-                if (target.intersectsWithObject(allObj[ind])){
+        for (var ind in itemsOnCanvas){
+                if (target!=itemsOnCanvas[ind] && target.intersectsWithObject(itemsOnCanvas[ind])){
                     isIt = true;
                     break;
                 }
             }
-        }
+        
         return isIt;
+    }
+    
+    function modifiedHandler(event){
+        console.log('modified', event.target.scaleX);
+    }
+    
+    function scalingHandler(){
+        
+        var obj = canvas.getActiveObject();
+        console.log('scaling', goodSize, obj);
+        obj.setCoords();
+        if (isOutOfHolder(obj) || isIntersecting(obj)){
+            console.log('not good !');
+            obj.set({scaleX: goodSize, scaleY: goodSize, top: goodTop, left: goodLeft});
+            
+        }else{
+            goodSize = obj.scaleX;
+            goodTop = obj.getTop();
+            goodLeft = obj.getLeft();
+        }
+        
     }
     
     //globals for element moving on canvas
     var goodTop, goodLeft;
-    var canvasObjectMoving = false;
+    //for scaling
+    var goodSize;
+    //var canvasObjectMoving = false;
  
-    function mDownHandler(){
-        var selected = canvas.getActiveObject();
-        if (selected){
-            goodTop = selected.getTop();
-            goodLeft = selected.getLeft();
-            canvasObjectMoving = true;
-        };
-    }
+//    function mOverHandler(){
+//        var selected = canvas.getActiveObject();
+//        if (selected){
+//            goodTop = selected.getTop();
+//            goodLeft = selected.getLeft();
+//            //canvasObjectMoving = true;
+//        };
+//    }
+    
+    //bgColor used as flag for modification on item (turned true for warning)
+    var bgColor = false;
     
     function mUpHandler(event){
         if (canvas.getActiveObject()){
-            setActiveProp('backgroundColor','');
-            canvasObjectMoving = false;
+            setActiveProp('stroke','');
+            setActiveProp('strokeWidth',0);
+            bgColor = false;
+            //canvasObjectMoving = false;
         }
     }
     
-    //flag drag&drop
-//    var dragdrop = false;
-//    
-//    var draggedDiv = null;
-    //bgColor used as flag
-    var bgColor;
+    
+    
     function movingHandler() {       
         var targ = canvas.getActiveObject();
         draggedDiv = targ.name;
@@ -484,15 +554,22 @@
             //dragdrop = false;
         }
         
-        setActiveProp('backgroundColor',bgColor?'red':'');
+        setActiveProp('stroke',bgColor?'red':'');
+        setActiveProp('strokeWidth', bgColor?1:0);
         
     };
 
             
-    function selectHandler() {
+    function selectHandler(event) {
+        selected = event.target;
+        goodTop = selected.getTop();
+        goodLeft = selected.getLeft();
+        //ok for uniform scaling, add ScaleY if not
+        goodSize = selected.getScaleX();
+        console.log(goodSize);
         $('#canControls').find("*").prop("disabled", false);
-        var $name = canvas.getActiveObject().name;
-        if($.contains($('#sf_fieldset_mandatory').get(0),$('input[id="'+$name+'"]').get(0))){
+        var $name = selected.name;
+        if($.contains($('#sf_fieldset_mandatory').get(0),$('[id="'+$name+'"]').get(0))){
             $('#object-remove').prop("disabled", true);
         }
         $('#canControls .btn-object-action').each(function(i){
@@ -634,14 +711,14 @@
 //    });
     
  
-function removGlobal(event, ui){
-    removeTextFromCanvas(ui.draggable);
-    ui.draggable.detach();
-}  
+//function removGlobal(event, ui){
+//    removeTextFromCanvas(ui.draggable);
+//    ui.draggable.detach();
+//}  
     
     //drag&drop
 $( window ).on( "load", function() {
-    canvas.on('custom:drop', function(event){});
+    //canvas.on('custom:drop', function(event){});
     
     var dragFromTabsOptions = { 
                         drag: function(event,ui){
@@ -666,18 +743,26 @@ $( window ).on( "load", function() {
                                 tolerance: "pointer",
                                 scope: "fromTabs",
                                 drop: function(event, ui) {
-                                    dropPt = {x: event.pageX-event.target.parentNode.offsetLeft - 30, y: event.pageY-event.target.parentNode.offsetTop - 10 };
+                                    dropPt = {x: event.pageX-event.target.parentNode.offsetLeft - 30, 
+                                              y: event.pageY-event.target.parentNode.offsetTop - 10 };
                                     var dropping = ui.draggable.clone(false);
                                     var dropZone = 'main';
                                     if(rectControl && dropPt.x >= rectControl.TL.x && dropPt.x <= rectControl.BR.x){
                                         dropZone = 'control';
-                                    }
+                                        }
                                     dropping.attr('id',dropZone+'.'+dropping.attr('id'));
                                     dropping.draggable(dragFromTemplateOptions);
                                     dropping.draggable('option', 'appendTo', 'body');
-                                    dropping.appendTo($('#inputOnTemplate'));
-                                    addText2Canvas(dropping, dropZone, dropPt);
+                                    
+                                    var addItemFlag=false;
+                                    if (dropping.attr('type')=='image' || dropping.is("button")){
+                                        addItemFlag = addItem2Canvas(dropping, dropZone, dropPt, 'image');
+                                    }else{
+                                        addItemFlag = addItem2Canvas(dropping, dropZone, dropPt, 'text');
                                     }
+                                    if(addItemFlag)
+                                        dropping.appendTo($('#inputOnTemplate'));
+                              }
                             });
     
     $('#sf_admin_form_tab_menu').droppable({
@@ -686,22 +771,27 @@ $( window ).on( "load", function() {
                                                 drop: function(event, ui) {
                                                     removeTextFromCanvas(ui.draggable);
                                                     ui.draggable.detach();
-                                                    canvasObjectMoving = false;
+                                                    //canvasObjectMoving = false;
                                                 }
                                         });
     
 });
 
     function outHandler(e){
-        if (canvasObjectMoving){   
-            if(targId = canvas.getActiveObject().id){
+        var activeObj = canvas.getActiveObject();
+        if (bgColor && activeObj){   
+            if(targId = activeObj.id){
             e.type = "mousedown.draggable";
-            $('#inputOnTemplate input[id="'+targId+'"]').trigger(e);
+            $('#inputOnTemplate [id="'+targId+'"]').trigger(e);
             }
         }
     };                                        
                                    
  
 //display
-$(".scrolled").css('height',$("#tabList").height());
+$(window).on('load', function(){
+    $(".scrolled").css('height',$("#tabList").height());
+});
+//add image tab
+
 </script>

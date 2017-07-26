@@ -11,11 +11,6 @@ $menu = $sf_data->getRaw('menu');
 <?php 
     $idCount = 1;
     foreach (array_keys($menu) as $key) {
-//        $className = "addLabelButton";
-//        if($key=='mandatory'){
-//            $className.=" checked";
-//        }
-        
         $tabIndex = -1;
         $ariaSelec = 'false';
         $classTab = "ui-state-default ui-corner-all";
@@ -30,6 +25,8 @@ $menu = $sf_data->getRaw('menu');
         $idCount+=1;
     }
     
+    
+    echo('<li class = "ui-state-default ui-corner-all" role = "tab" tabindex = "'.$tabIndex.'" aria-controls = "sf_fieldset_images" aria-labelledby = "ui-id-'.$tabIndex.'" aria-selected = "false"><a href = "#sf_fieldset_images" class = "ui-tabs-anchor" role = "presentation" tabindex = "-1" id = "ui-id-'.$tabIndex.'">Images</a></li>');                
 ?>
 </ul>
 <?php
@@ -50,6 +47,12 @@ foreach ($menu as $fieldset => $elements) {
     echo('</div>');
     $idCount+=1;
 }
+
+echo('<div id="sf_fieldset_images" class="scrolled ui-corner-all ui-tabs-panel ui-widget-content ui-corner-bottom" aria-labelledby="ui-id-'.$idCount.'" role="tabpanel" aria-expanded="false" aria-hidden="true">'
+        . '<button type="button" id="barcode" class="addLabelButton draggable"><img src="/images/customize/BCodeSample.png" height="42" width="115" alt="BarCode"></button>'
+        . '<button type="button" id="qrcode" class="addLabelButton draggable"><img src="/images/customize/QrCodeSample.png" height="50" width="50" alt="QrCode"></button>'
+        . '</div>');
+
 ?>
 
 
