@@ -1,26 +1,26 @@
 # eveCustom
-an add-on to e-venement to customize tickets templates  
+
+> an add-on to e-venement to customize tickets templates  
 
 ## Installation on e-venement v2.10.2
 - add files from the list below
 - create models via Doctrine: 
-            - files:
-                            + /config/customTemplate-schema.yml
-                            + /config/link4custom-schema.yml
-            - commands:  
-                            + ./symfony doctrine:create-model-tables
-                            + ./symfony doctrine:generate-admin
+  - files:
+    - /config/customTemplate-schema.yml
+    - /config/link4custom-schema.yml
+  - commands:  
+    - ./symfony doctrine:create-model-tables
+    - ./symfony doctrine:generate-admin
 
 - pages can be accessed at:
-                            + /tck.php/ticket/customize
-                            + ./customizeMenu
-                            + ./customizeSave
+  - /tck.php/ticket/customize
+  - ./customizeMenu
+  - ./customizeSave
 
 
 
 ### list of modified files (according to GIT + checked on fresh install)
 <!--commented lines are ignored, will be removed, keeping now for tracking/bug/testing -->
-
 <!--.gitignore-->
 README.md
 <!--apps/default/config/app.yml.template-->
@@ -97,3 +97,20 @@ web/js/customize/fabric.min.js
 #web/js/customize/w3.js
 #web/tck_dev.php-->
 
+
+## using tips
+- make sure fabricjs is on the server.
+The two files in the list are two different version, both were tested.
+Please refer to fabricjs.com for demo/docs and to get other versions
+- to create JSON files from object, for templating and parameters, please refer to web/js/customize/customFunc.js
+
+
+## TODO
+- integration to e-venement menu
+- integration with symfony1/e-venement/doctrine auto-generation
+- code and user testings (bughunting)
+- code review (doc, comments, etc)
+- add more options for other kind of objects (card member, maps, etc)
+- background image
+- custom template with non-customizable spots
+- and many other things...
