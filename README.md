@@ -4,10 +4,10 @@ an add-on to e-venement to customize tickets templates
 ## Installation on e-venement v2.10.2
 - add files from the list below
 - create models via Doctrine: 
-            + files:
+            - files:
                             + /config/customTemplate-schema.yml
                             + /config/link4custom-schema.yml
-            + commands:  
+            - commands:  
                             + ./symfony doctrine:create-model-tables
                             + ./symfony doctrine:generate-admin
 
