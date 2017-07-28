@@ -729,7 +729,7 @@
         var transition = $('#transition').fadeIn('fast');
           
         
-        $('<iframe src="' + $(this).parent().prop('href') + '" id="about" style="width: 400px"></iframe>')
+        $('<iframe src="' + $(this).parent().prop('href') + '" id="about" style="width: 400px; height: 600px;"></iframe>')
                 .hide().appendTo('body');
         $('#about').fadeIn(50);
         

@@ -446,10 +446,28 @@ class ticketActions extends sfActions
         }
     }
   
+  protected function getEvents(){
+      $q = Doctrine::getTable('Event')
+    ->createQuery('e')
+    ->orderBy('translation.name')
+    ->limit(500)
+    ->andWhereIn('e.meta_event_id',array_keys($this->getUser()->getMetaEventsCredentials()));
+    
+    $events = array();
+    foreach ( $q->execute() as $event )
+      $events[$event->id] = $event.' ('.$event->MetaEvent.')';
+    
+    return $events;
+  }
+    
+    
+    
   public function executeCustomizeSave(sfWebRequest $request){
       $this->setLayout('empty');
-      
+      $this->events = $this->getEvents();
   }
+  
+
   
   public function executeCustomizeMenu(sfWebRequest $request){
       
@@ -459,9 +477,7 @@ class ticketActions extends sfActions
     ->limit(500)
     ->andWhereIn('e.meta_event_id',array_keys($this->getUser()->getMetaEventsCredentials()));
     
-    $this->events = array();
-    foreach ( $q->execute() as $event )
-      $this->events[] = [$event->id => $event.' ('.$event->MetaEvent.')'];
+    $this->events = $this->getEvents();
     
     $qTemplate = Doctrine::getTable('customTemplate')
                     ->createQuery('cT')

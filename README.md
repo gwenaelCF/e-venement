@@ -111,6 +111,8 @@ Please refer to fabricjs.com for demo/docs and to get other versions
 ## TODO
 - integration to e-venement menu
 - integration with symfony1/e-venement/doctrine auto-generation
+- translations
+- list of templates in the menu page
 - code and user testings (bugs-hunting)
 - code review (doc, comments, etc)
 - add more options for other kind of objects (card member, maps, etc)

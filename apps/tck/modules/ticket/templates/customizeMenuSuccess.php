@@ -109,11 +109,10 @@
         if(data2link!=null){
             selecItem.prop("disabled", false);
             $('#selButton').prop("disabled", false);
-            selecItem.append(new Option("global template (no event linked)",0));
-            for(var key in data2link){
+            selecItem.append(new Option("global template (no link)",0));
+            for(var i=0; i < data2link.length; i++){
                 //faster than creating another to compare ?
-                for(n in data2link[key])
-                    selecItem.append(new Option(data2link[key][n],n));
+                    selecItem.append(new Option(data2link[i],i));
             }
         }else {
             $('#selectionText h3').text("Please choose above");
