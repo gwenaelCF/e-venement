@@ -33,7 +33,7 @@
                     
                     <ul class="sf_admin_actions_form">
                         <li><button class="fg-button ui-state-default fg-button-icon-left" id="print" type="button"><span class="ui-icon ui-icon-print"></span>test print</button></li>
-                        <li><button class="fg-button ui-state-default fg-button-icon-left" id="serializer" type="button"><span class="ui-icon ui-icon-circle-check"></span>save template</button></li>
+                        <li><a href="<?php echo url_for('ticket/customizeSave') ?>" class="fancybox"><button class="fg-button ui-state-default fg-button-icon-left" id="serializer" type="button"><span class="ui-icon ui-icon-circle-check"></span>save template</button></a></li>
                         <li><button class="fg-button ui-state-default fg-button-icon-left" id="back" type="button"><span class="ui-icon ui-icon-arrowreturnthick-1-w"></span>back</button></li>
                     </ul>
 <!--            TODO-->
@@ -60,13 +60,12 @@
                 <button type="button" class="btn-object-remove ui-controlgroup-item" id="object-remove">Remove</button>
                 <label for="font-family">Font type:</label>
                 <select id="font-family" class="slct-object-action ui-controlgroup-item" data-property="fontFamily">
-                    <option value="arial">Arial</option>
-                    <option value="arial narrow">Arial Narrow</option>
-                    <option value="times new roman">Times NR</option>
-                    <option value="helvetica" selected="">Helvetica</option>
-                    <option value="verdana">Verdana</option>
-                    <option value="courier">Courier</option>
-                    <option value="impact">Impact</option>
+                    <?php 
+                        
+                        foreach ($font as $key => $value) {
+                            echo('<option value="'.$key.'" style="font-family:'.$key.';">'.$value.'</option>');
+                        }
+                    ?>
                 </select>
                 
                 <label for="text-align" hidden>Text align:</label>
@@ -114,20 +113,22 @@
 </div>
 
     <div class="">
-        <form id="tckTemplate" method="post" autocomplete="off" action="<?php echo url_for('ticket/submit') ?>" enctype="multipart/form-data">
+        <form id="tckTemplate" method="post" autocomplete="off" action="<?php echo url_for('ticket/customizeSave') ?>" enctype="multipart/form-data">
 
             <button class="fg-button ui-state-default" id="save" type="button" hidden="true">save</button>
             <!-- TODO set values through PHP -->
+            <input type="text" name="name" id="name" value="<?php echo(str_shuffle('le petit chat est mort'))?>" hidden>
             <input type="text" name="controller" id="controller" value="R" hidden>
             <input type="number" name="contrlWidth" id="contrlWidth" value="40" hidden>
-            <input type="number" name="event_id" id="event_id" value="82" hidden>
-            <input type="text" name="datacustom" id="datacustom" hidden>
+            <input type="number" name="event_id" id="event_id" value="<?php echo($eventId) ?>" hidden>
+            <input type="text" name="dataJson" id="dataJson" hidden>
+            <input type="text" name="dataSvg" id="dataSvg" hidden>
             <input type="text" name="description" id="description" hidden>
-            <input type="number" name="ticketHeight" id="ticketHeight" value="50" hidden>
-            <input type="number" name="ticketWidth" id="ticketWidth" value="150" hidden>
+            <input type="number" name="ticketHeight" id="ticketHeight" value="<?php echo($tckSize['height'])?>" hidden>
+            <input type="number" name="ticketWidth" id="ticketWidth" value="<?php echo($tckSize['width'])?>" hidden>
         </form>
     </div>
-
+<div id="transition" class="close"><span class="close"></span></div>
 <script type="text/javascript">
     
     
@@ -249,15 +250,28 @@
         if (target.hasClass(checkedClass)) {
             addItem2Canvas(target);
         } else {
-            removeTextFromCanvas(target);
+            removeItemFromCanvas(target);
         }
     }
-
-    function removeTextFromCanvas(target) {
-        var id2remove = target.attr('id');
-        var myObj = canvas.getObjects();
-        var index = myObj.findIndex(obj => (obj.id === id2remove));
-        canvas.remove(myObj[index]);
+    
+    // keeping tracks of all items
+    var itemsOnCanvas = [];
+    
+    function removeItemFromCanvas(target) {
+//        console.log(target);
+//        var id2remove = target.attr('id');
+//        var myObj = canvas.getObjects();
+//        var index = myObj.findIndex(obj => (obj.id === id2remove));
+        console.log(itemsOnCanvas);
+        canvas.remove(target);
+        var toRemove = $('#templating #inputOnTemplate [id="'+target.id+'"]');
+        console.log(toRemove);
+        toRemove.detach();
+        console.log(itemsOnCanvas);
+        var index = itemsOnCanvas.findIndex(function(elm){return (elm.id == target.id);});
+        console.log(index);
+        itemsOnCanvas.splice(index,1);
+        console.log(itemsOnCanvas);
 
     }
     
@@ -304,13 +318,18 @@
         return item2add;
     }
     
-    // keeping tracks of all items
-    var itemsOnCanvas = [];
+    
     
     function addItem2Canvas(target, holder='main', position={x:1,y:1}, type='text')
     {
+        console.log('target', target);
         var contain = (holder=='main')?rectMain:rectControl;
-        target.id = holder+'.'+target.id;
+        target[0].id = holder+'.'+target[0].name;
+        console.log(target);
+        if(itemsOnCanvas.findIndex(function(elm){return (elm.id == target.id);})!=-1){
+            fadeInOut("Element can be added only once per container", 8000);
+            return false;
+        }
         var item2add;
         switch(type) {
             case 'text':
@@ -322,7 +341,7 @@
                 item2add = buildImageObject(target, contain);
                 break;
             default:
-                console.log('error create object');
+                console.log('error creating object');
                 return;
         }
         item2add.left = position.x;
@@ -366,6 +385,7 @@
     //called on document load
     function checkStatePutEvent() {
         $('.addLabelButton.checked').each(function () {
+            console.log('checked', $(this));
             addItem2Canvas($(this));
             if (rectControl){
                 addItem2Canvas($(this), 'control');
@@ -480,17 +500,19 @@
     function scalingHandler(){
         
         var obj = canvas.getActiveObject();
-        console.log('scaling', goodSize, obj);
         obj.setCoords();
         if (isOutOfHolder(obj) || isIntersecting(obj)){
-            console.log('not good !');
+            bgColor = true;
             obj.set({scaleX: goodSize, scaleY: goodSize, top: goodTop, left: goodLeft});
             
         }else{
             goodSize = obj.scaleX;
             goodTop = obj.getTop();
             goodLeft = obj.getLeft();
+            bgColor = false;
         }
+        setActiveProp('stroke',bgColor?'red':'');
+        setActiveProp('strokeWidth', bgColor?1:0);
         
     }
     
@@ -658,9 +680,9 @@
         if ($.contains($('#sf_fieldset_mandatory').get(0),$('input[id="'+activeObj.name+'"]').get(0))){
             fadeInOut("mandatory element cannot be removed", 5000);
         }else{
-            var toRemove = $('#templating #inputOnTemplate input[id="'+activeObj.name+'"]').get(0);
-            removeTextFromCanvas(toRemove);
-            toRemove.detach();
+           
+            removeItemFromCanvas(activeObj);
+             
         }
     });
     
@@ -681,24 +703,44 @@
     };
     
     //save ticket to base
-    document.getElementById("serializer").onclick = function () {
+    document.getElementById("serializer").onclick = function (event) {
         //myTck = JSON.stringify(canvas);
         //console.log(myTck);
+        event.preventDefault();
+        event.stopPropagation();
         canvas.setBackgroundColor('');
         var myTck = canvas.toSVG({width:"100%", height:"100%"});
         console.log(canvas.toObject());
         console.log(canvas.toSVG({width:"100%", height:"100%"}));
         //document.getElementById("print").disabled = false;
-        $('#flash').load(
-                $('#tckTemplate').attr('action'),
-                {   event_id: $('input[name=event_id]').val(), 
-                    datacustom: myTck, 
-                    ticketheight: $('input[name=ticketHeight]').val(), 
-                    ticketwidth: $('input[name=ticketWidth]').val()
-                }
-        );
+//        $('#flash').load(
+//                $('#tckTemplate').attr('action'),
+//                {   event_id: $('input[name=event_id]').val(), 
+//                    datacustom: myTck, 
+//                    ticketheight: $('input[name=ticketHeight]').val(), 
+//                    ticketwidth: $('input[name=ticketWidth]').val()
+//                }
+//        );
+        //$('#tckTemplate').submit();
+       
+       
+        
+
+        var transition = $('#transition').fadeIn('fast');
+          
+        
+        $('<iframe src="' + $(this).parent().prop('href') + '" id="about" style="width: 400px"></iframe>')
+                .hide().appendTo('body');
+        $('#about').fadeIn(50);
+        
         canvas.setBackgroundColor('white');
+        return false;
     };
+    
+    $('#transition .close').on('click', function(){
+        $('#about').detach();
+    });
+
     
     //back button
     document.getElementById("back").onclick = function () {
@@ -712,7 +754,7 @@
     
  
 //function removGlobal(event, ui){
-//    removeTextFromCanvas(ui.draggable);
+//    removeItemFromCanvas(ui.draggable);
 //    ui.draggable.detach();
 //}  
     
@@ -739,7 +781,7 @@ $( window ).on( "load", function() {
     
     $('#sf_admin_form_tab_menu .draggable').draggable(dragFromTabsOptions);
 
-    $('#tktCanvas').droppable({
+    $('#tktCanvas').droppable({ 
                                 tolerance: "pointer",
                                 scope: "fromTabs",
                                 drop: function(event, ui) {
@@ -769,8 +811,8 @@ $( window ).on( "load", function() {
                                                 tolerance: "pointer",
                                                 scope: "fromCanvas",
                                                 drop: function(event, ui) {
-                                                    removeTextFromCanvas(ui.draggable);
-                                                    ui.draggable.detach();
+                                                    removeItemFromCanvas(canvas.getActiveObject());
+                                                    //ui.draggable.detach();
                                                     //canvasObjectMoving = false;
                                                 }
                                         });
@@ -791,6 +833,7 @@ $( window ).on( "load", function() {
 //display
 $(window).on('load', function(){
     $(".scrolled").css('height',$("#tabList").height());
+    console.log($('#tckTemplate #name').val());
 });
 //add image tab
 

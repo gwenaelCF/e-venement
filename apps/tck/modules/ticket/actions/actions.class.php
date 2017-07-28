@@ -381,22 +381,25 @@ class ticketActions extends sfActions
           $fileJson = fopen(__DIR__.'/../config/ticketParam.json', 'r');
           $jsonParam = json_decode(fread($fileJson,filesize(__DIR__.'/../config/ticketParam.json')), TRUE);
           fclose($fileJson);
-          //treated in the component
-          //uasort($jsonParam, 'comPar2');
           
-          $size = array();
+          $fontSizes = array();
             for ($i = 6; $i < 20; $i++) {
                 $size[$i] = $i;
             }
           // TODO USE THAT FOR GENERALISATION!!  
           //$this->tckForm =new CustomTicketForm(array(),array('param'=>$jsonParam));
           
-          //should come from the menu
-          $this->eventId = 43;
-          $this->event = null;
+          $this->tempType = $request->getPostParameter('tempType');
+          $this->eventId = $request->getPostParameter('selecItem');
+          //$this->event = null; ???
           $this->json = $jsonParam;
-          $this->font = array("Arial"=>"Arial", "Lucida"=>"Lucida", "Helvetica"=>"Helvetica", "Lucida-Console"=>"Lucida Console");
-          $this->size = $size;
+          // from paramFile
+          $customParams = sfConfig::get('app_tickets_customize');
+          $this->font = $customParams['fontFamilies'];
+          $this->tckSize = $customParams[$this->tempType];
+          //$this->font = array("arial"=>"Arial", "arial narrow"=>"Arial Narrow", "helvetica"=>"Helvetica", "courier"=>"Courier", "georgia"=>"Georgia");
+          
+          $this->fontSizeRange = $customParams['fontSize'];
   }
   
   //goto customPrint
@@ -407,7 +410,7 @@ class ticketActions extends sfActions
   }
   
   //save the template
-  public function executeSubmit(sfWebRequest $request){
+  public function executeCustomizeSubmit(sfWebRequest $request){
       //$this->forwardUnless($query = $request->getParameter('query'), 'job', 'index');
 
       //$this->jobs = Doctrine_Core::getTable('JobeetJob')->getForLuceneQuery($query);
@@ -442,7 +445,11 @@ class ticketActions extends sfActions
           return $this->renderText('ticket template saved for '.$event);
         }
     }
-
+  
+  public function executeCustomizeSave(sfWebRequest $request){
+      $this->setLayout('empty');
+      
+  }
   
   public function executeCustomizeMenu(sfWebRequest $request){
       
@@ -455,6 +462,14 @@ class ticketActions extends sfActions
     $this->events = array();
     foreach ( $q->execute() as $event )
       $this->events[] = [$event->id => $event.' ('.$event->MetaEvent.')'];
-      
+    
+    $qTemplate = Doctrine::getTable('customTemplate')
+                    ->createQuery('cT')
+                    ->leftJoin('link4custom')
+                    ->orderBy('updated_at DESC');
+    
+    $this->customTemplates = array();
+    foreach ( $qTemplate->execute() as $cTemp )
+      $this->customTemplates[] = $cTemp;
   }
 }

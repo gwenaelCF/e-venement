@@ -20,7 +20,7 @@
             <h3>
                 Select a type of template
             </h3>
-            <select required id="tempType" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status">
+            <select required id="tempType" name="tempType" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status">
                 <option value="">please choose</option>
                 <option value="therm">thermal printed ticket</option>
                 <option value="dmz">dematerialized ('A' series)</option>
@@ -32,10 +32,10 @@
             <h3>
 
             </h3>
-            <select id="selecItem" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status" disabled>
+            <select id="selecItem" name="selecItem" class="selectCustom ui-selectmenu ui-widget ui-state-default ui-selectmenu-dropdown ui-selectmenu-status" disabled>
                 <option value=""></option>
             </select>
-            <input id='selButton' value="ok" class="butCustom ui-button ui-state-default ui-corner-all" type="submit">
+            <input id='selButton' name='selButton' value="ok" class="butCustom ui-button ui-state-default ui-corner-all" type="submit">
         </div>
         </form>
     </div>
@@ -46,7 +46,35 @@
         <div class="ui-widget-header ui-corner-all fg-toolbar">
             <h1 title="">List of existing templates</h1>
         </div>
-        
+        <table>
+  <thead class="ui-widget-header">
+    <tr>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column" hidden>Id</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Name</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Description</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Type</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Link</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Height</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Width</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Controller</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Created at</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Updated at</th>
+      <th class="sf_admin_text sf_admin_list ui-state-default ui-th-column">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php foreach ($customTemplates as $cTemp): ?>
+    <tr>
+      <td><?php //echo $jobeet_job->getId() ?></td>
+      <td><?php //echo $jobeet_job->getCategoryId() ?></td>
+      <td><?php //echo $jobeet_job->getType() ?></td>
+<!-- more columns here -->
+      <td><?php //echo $jobeet_job->getCreatedAt() ?></td>
+      <td><?php //echo $jobeet_job->getUpdatedAt() ?></td>
+    </tr>
+    <?php endforeach ?>
+  </tbody>
+</table>
     </div>
             </table>
 

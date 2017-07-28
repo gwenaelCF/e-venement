@@ -10,7 +10,7 @@
     - /config/link4custom-schema.yml
   - commands:  
     - ./symfony doctrine:create-model-tables
-    - ./symfony doctrine:generate-admin
+    - ./symfony doctrine:generate-admin <!-- please review the generation files -->
 
 - pages can be accessed at:
   - /tck.php/ticket/customize
@@ -97,6 +97,9 @@ web/js/customize/fabric.min.js
 #web/js/customize/w3.js
 #web/tck_dev.php-->
 
+## princip of working
+![diagram](https://raw.githubusercontent.com/gwenaelCF/e-venement/v2.10/diagramFunc.jpg)
+
 
 ## using tips
 - make sure fabricjs is on the server.
@@ -108,7 +111,7 @@ Please refer to fabricjs.com for demo/docs and to get other versions
 ## TODO
 - integration to e-venement menu
 - integration with symfony1/e-venement/doctrine auto-generation
-- code and user testings (bughunting)
+- code and user testings (bugs-hunting)
 - code review (doc, comments, etc)
 - add more options for other kind of objects (card member, maps, etc)
 - background image
