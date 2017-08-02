@@ -118,14 +118,15 @@
             <button class="fg-button ui-state-default" id="save" type="button" hidden="true">save</button>
             <!-- TODO set values through PHP -->
             <input type="text" name="name" id="name" value="<?php echo(str_shuffle('le petit chat est mort'))?>" hidden>
-            <input type="text" name="controller" id="controller" value="R" hidden>
-            <input type="number" name="contrlWidth" id="contrlWidth" value="40" hidden>
+            <input type="text" name="controller" id="controller" value="<?php echo($controller)?>" hidden>
+            <input type="number" name="contrlWidth" id="contrlWidth" value="<?php echo($tckSize['controller'])?>" hidden>
             <input type="number" name="event_id" id="event_id" value="<?php echo($eventId) ?>" hidden>
             <input type="text" name="dataJson" id="dataJson" hidden>
-            <input type="text" name="dataSvg" id="dataSvg" hidden>
+            <input type="text" name="dataSvg" id="dataSvg" value="" hidden>
             <input type="text" name="description" id="description" hidden>
             <input type="number" name="ticketHeight" id="ticketHeight" value="<?php echo($tckSize['height'])?>" hidden>
             <input type="number" name="ticketWidth" id="ticketWidth" value="<?php echo($tckSize['width'])?>" hidden>
+            <input type="text" name="type" id="type" value=""
         </form>
     </div>
 <div id="transition" class="close"><span class="close"></span></div>
@@ -168,9 +169,9 @@
         containWidth = tckWidth - pxCtrlWidth;
             //starting point of the controller
         
-        if (controller=='R'){
+        if (controller=='L'){
             containStart = pxCtrlWidth;
-        //only R for now, but add here other cases (upper, down, etc(?))
+        //only right or left for now, but add here other cases (upper, down, etc(?))
         }else{
             controlStart = tckWidth - pxCtrlWidth;
         }
@@ -707,11 +708,11 @@
         //myTck = JSON.stringify(canvas);
         //console.log(myTck);
         event.preventDefault();
-        event.stopPropagation();
+
         canvas.setBackgroundColor('');
         var myTck = canvas.toSVG({width:"100%", height:"100%"});
         console.log(canvas.toObject());
-        console.log(canvas.toSVG({width:"100%", height:"100%"}));
+        console.log(myTck);
         //document.getElementById("print").disabled = false;
 //        $('#flash').load(
 //                $('#tckTemplate').attr('action'),
@@ -722,17 +723,11 @@
 //                }
 //        );
         //$('#tckTemplate').submit();
-       
-       
-        
-
+       $('#dataSvg').val(canvas.toSVG({width:"100%", height:"100%"}));
         var transition = $('#transition').fadeIn('fast');
-          
-        
         $('<iframe src="' + $(this).parent().prop('href') + '" id="about" style="width: 400px; height: 600px;"></iframe>')
                 .hide().appendTo('body');
         $('#about').fadeIn(50);
-        
         canvas.setBackgroundColor('white');
         return false;
     };

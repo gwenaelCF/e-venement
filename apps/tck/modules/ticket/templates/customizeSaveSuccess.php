@@ -3,12 +3,13 @@
 <div id="sf_fieldset_general" class="ui-corner-all ui-tabs-panel ui-widget-content ui-corner-bottom" style="display: block;">
     <div class="fg-toolbar ui-widget-header ui-corner-all">
         <h1>New template</h1>
-    </div>                 
+    </div>
+    <form>
     <div class="sf_admin_form_row sf_admin_text sf_admin_form_field_short_name">
         <label for="name">Nom</label>
         <div class="label ui-helper-clearfix"></div>
         <div class="widget" title="Name" >
-            <input name="name" id="name" type="text" placeholder="name is mandatory" maxlength="80">
+            <input name="name" id="name" type="text" placeholder="name is mandatory" maxlength="80" required>
         </div>
     </div>
                                   
@@ -26,7 +27,7 @@
                 <option value="0">global template (no link)</option>
                 <?php foreach ($sf_data->getRaw('events') as $key => $value) {
                     
-                    echo('<option value="'.$key.'">'.$value.'</option>');
+                    echo('<option value="'.$value.'">'.$key.'</option>');
                 }?>
             </select>
 
@@ -37,15 +38,26 @@
             <button class="fg-button ui-state-default fg-button-icon-left" id="save" type="button"><span class="ui-icon ui-icon-circle-check"></span>confirm saving</button>
             <button class="fg-button ui-state-default fg-button-icon-left" id="cancel" type="button"><span class="ui-icon ui-icon-cancel"></span>cancel</button>
         </div>
-    
+    </form>
 </div> 
 
 <script>
-    
+    var saving = function (){
+        var formTemp = $('#tckTemplate', window.parent.document);
+        $('#flash', window.parent.document).load(formTemp.attr('action'),{
+                event_id: $('input[name=event_id]').val(),
+                name: $('input[name=name]').val(),
+                description: $('input[name=description').val()
+                }
+            );
+        //$('#tckTemplate').submit();
+    };
     //console.log('name', $('#tckTemplate #name', window.parent.document).val());
     var defaultEvent = $('#tckTemplate #event_id', window.parent.document).val();
-    $('#cancel').on('click', function(){$('#transition .close', window.parent.document).trigger("click");});
     $('#event_id option[value="'+defaultEvent+'"]').prop('selected', true);
+    $('#cancel').on('click', function(){$('#transition .close', window.parent.document).trigger("click");});
+    $('#save').on('click', saving);
+
 </script>
 
 

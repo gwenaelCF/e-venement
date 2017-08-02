@@ -93,8 +93,7 @@
         switch(tempType.val()){
             //Keep options in case of huge differences in prod for thermal and other tickets
             //  or if the same menu is called for badges, member cards, etc.
-            //  If not remove the switch/case.
-            // TODO check param needed and apply the correct algo
+            //  If not switch/case van be removed
             case "therm":
                 
             case "dmz":
@@ -110,10 +109,11 @@
             selecItem.prop("disabled", false);
             $('#selButton').prop("disabled", false);
             selecItem.append(new Option("global template (no link)",0));
-            for(var i=0; i < data2link.length; i++){
-                //faster than creating another to compare ?
-                    selecItem.append(new Option(data2link[i],i));
+            var eventArray = new Array();
+            for(item in data2link){
+                selecItem.append(new Option(item,data2link[item]));
             }
+
         }else {
             $('#selectionText h3').text("Please choose above");
             selecItem.prop("disabled", true).attr("size", 1); 

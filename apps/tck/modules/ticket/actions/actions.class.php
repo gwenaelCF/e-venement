@@ -381,25 +381,29 @@ class ticketActions extends sfActions
           $fileJson = fopen(__DIR__.'/../config/ticketParam.json', 'r');
           $jsonParam = json_decode(fread($fileJson,filesize(__DIR__.'/../config/ticketParam.json')), TRUE);
           fclose($fileJson);
-          
-          $fontSizes = array();
-            for ($i = 6; $i < 20; $i++) {
-                $size[$i] = $i;
-            }
+//
           // TODO USE THAT FOR GENERALISATION!!  
           //$this->tckForm =new CustomTicketForm(array(),array('param'=>$jsonParam));
           
           $this->tempType = $request->getPostParameter('tempType');
           $this->eventId = $request->getPostParameter('selecItem');
-          //$this->event = null; ???
+          
           $this->json = $jsonParam;
-          // from paramFile
+          
           $customParams = sfConfig::get('app_tickets_customize');
           $this->font = $customParams['fontFamilies'];
           $this->tckSize = $customParams[$this->tempType];
-          //$this->font = array("arial"=>"Arial", "arial narrow"=>"Arial Narrow", "helvetica"=>"Helvetica", "courier"=>"Courier", "georgia"=>"Georgia");
-          
           $this->fontSizeRange = $customParams['fontSize'];
+          $this->controller = '';
+          // add controller if the size is known
+          if($this->tckSize['controller']){
+              if (sfConfig::has('app_tickets_control_left')){
+                  $this->controller = 'L';
+              }else{
+                  $this->controller = 'R';
+              }
+          }
+          
   }
   
   //goto customPrint
@@ -455,7 +459,7 @@ class ticketActions extends sfActions
     
     $events = array();
     foreach ( $q->execute() as $event )
-      $events[$event->id] = $event.' ('.$event->MetaEvent.')';
+      $events[$event.' ('.$event->MetaEvent.')'] = $event->id;
     
     return $events;
   }
