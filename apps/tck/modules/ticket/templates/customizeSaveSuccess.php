@@ -51,6 +51,7 @@
                 }
             );
         //$('#tckTemplate').submit();
+        $('cancel').trigger('click');
     };
     //console.log('name', $('#tckTemplate #name', window.parent.document).val());
     var defaultEvent = $('#tckTemplate #event_id', window.parent.document).val();

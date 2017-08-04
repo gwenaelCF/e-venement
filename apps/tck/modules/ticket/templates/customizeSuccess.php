@@ -126,7 +126,7 @@
             <input type="text" name="description" id="description" hidden>
             <input type="number" name="ticketHeight" id="ticketHeight" value="<?php echo($tckSize['height'])?>" hidden>
             <input type="number" name="ticketWidth" id="ticketWidth" value="<?php echo($tckSize['width'])?>" hidden>
-            <input type="text" name="type" id="type" value=""
+            <input type="text" name="type" id="type" value="" hidden>
         </form>
     </div>
 <div id="transition" class="close"><span class="close"></span></div>
@@ -320,14 +320,21 @@
     }
     
     
-    
+    /*
+     * function adding item on the canvas
+     * @param {DO} target
+     * @param {string} holder
+     * @param {point} position
+     * @param {string} type
+     * @return {bool} 
+     */
     function addItem2Canvas(target, holder='main', position={x:1,y:1}, type='text')
     {
         console.log('target', target);
         var contain = (holder=='main')?rectMain:rectControl;
         target[0].id = holder+'.'+target[0].name;
         console.log(target);
-        if(itemsOnCanvas.findIndex(function(elm){return (elm.id == target.id);})!=-1){
+        if(itemsOnCanvas.findIndex(function(elm){return (elm.id == target[0].id);})!=-1){
             fadeInOut("Element can be added only once per container", 8000);
             return false;
         }
@@ -347,11 +354,11 @@
         }
         item2add.left = position.x;
         item2add.top = position.y;
+        //add item and check if not intersecting and fully inside.
+        //  if not, try a random position up to 1500 times.
+        //  if still not possible, remove the item
         canvas.add(item2add);
-        console.log('adding');
-        console.log(item2add);
         var counter =0;
-        //could be a pb for generalisation, TODO algo review
         var minLeft = (holder==='main')? containStart:controlStart;
         var maxLeft = (holder==='main')? containWidth+containStart-item2add.width 
                                     : controlStart+pxCtrlWidth - item2add.width; 
@@ -367,7 +374,8 @@
                 return false;
             }
         }
-        fabric.util.animateColor('#FFF700', '#eee', 500, {
+        //animate the newly added item
+        fabric.util.animateColor('#FFF700', '#eee', 600, {
             onChange: function(val) {
             item2add.set('backgroundColor', val);
             canvas.renderAll();
@@ -382,8 +390,9 @@
         console.log(itemsOnCanvas);
         return true;
     }
-
-    //called on document load
+    /*
+     * add mandatories item on document load
+     */
     function checkStatePutEvent() {
         $('.addLabelButton.checked').each(function () {
             console.log('checked', $(this));
@@ -412,13 +421,6 @@
         if (isOutOfHolder(selectObject) || isIntersecting(selectObject)){
             setActiveStyle($(inputItem).attr("data-property"),oldProp);
             fadeInOut("overlapping and 'out of bounds' forbidden", 5000);
-            //optionSetState is not working correctly
-//            if ($(inputItem).is(":button"))
-//                butSetState(inputItem);
-//            else{
-//                optionSetState(selectObject, inputItem);
-//                
-//            } 
             canvas.discardActiveObject();
             canvas.setActiveObject(selectObject);
         }
@@ -467,19 +469,7 @@
     //var marg = -2;
     function isOutOfHolder(target){
         var placed = target.container;
-        return !target.isContainedWithinRect(placed.TL, placed.BR);
-        
-        
-// can be used with canvas without controller
-//        if((target.getLeft() < marg) 
-//                    || (target.getTop() < marg) 
-//                    || (target.getWidth() + target.getLeft() > (canvasWidth - marg))
-//                    || (target.getHeight() + target.getTop() > (canvasHeight - marg)))
-//            {
-//                return true;
-//            }else{
-//                return false;
-//            }    
+        return !target.isContainedWithinRect(placed.TL, placed.BR);    
     }
     
     function isIntersecting(target){
@@ -664,7 +654,7 @@
     //check and put on template the mandatory elements, bind the others to an event
     $(document).on("load", checkStatePutEvent());
     
-    var fadeInOut = function (message, d) {
+    function fadeInOut(message, d) {
         var flC = $('#flashCanvas');
         if (flC.css("opacity") > 0)
             flC.stop(true, true);
